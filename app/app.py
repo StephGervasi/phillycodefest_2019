@@ -5,7 +5,9 @@ from dash.dependencies import Input, Output, State
 import geocoder
 
 
-app = dash.Dash(__name__)
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 app.layout = html.Div(children=[
 
@@ -18,6 +20,8 @@ app.layout = html.Div(children=[
     ),
 
     html.Button('Search', id='button', n_clicks=0),
+
+    html.Br(),
 
     html.Div(id='output-submit'),
 
@@ -113,7 +117,7 @@ app.layout = html.Div(children=[
         ],
         values=[]
     )
-])
+], style={'margin-left': 'auto', 'margin-right': 'auto', 'width': '50%'})
 
 @app.callback(Output('output-submit', 'children'),
               [Input('button', 'n_clicks')],
