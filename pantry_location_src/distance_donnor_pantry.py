@@ -5,6 +5,12 @@ import json
 pd.set_option("mode.chained_assignment", 'raise')
 from geopy.distance import geodesic
 from geojson import Feature, FeatureCollection, Point
+from pyzipcode import ZipCodeDatabase
+
+def coordinates_from_zip(zip_code):
+    zcdb = ZipCodeDatabase()
+    zipcode = zcdb[zip_code]
+    return zipcode.latitude, zipcode.longitude
 
 def compute_distance(from_lat, from_long, to_lat, to_long, verbose=False):
     '''
