@@ -1,13 +1,14 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 import geocoder
 
 
 app = dash.Dash(__name__)
 
 app.layout = html.Div(children=[
+
     # zipcode input box
     dcc.Input(
         id='zipcode',
@@ -15,6 +16,11 @@ app.layout = html.Div(children=[
         type='text',
         value=''
     ),
+
+    html.Button('Search', id='button', n_clicks=0),
+
+    html.Div(id='output-submit'),
+
     # Item selection menu
     dcc.Dropdown(
         id='item',
@@ -95,19 +101,25 @@ app.layout = html.Div(children=[
         values=[]
     ),
 
-    # dcc.Checklist(
-    #     id='dairy_eggs_subcat',
-    #     options=[
-    #         {'label': r'Fluid Dairy (Milk, Half and Half, Eggnog, etc)', 'value': 'fluid_dairy'},
-    #         {'label': r'Yogurt, Sour Cream, Cottage Cheese, Pasta', 'value': 'multi'},
-    #         {'label': r'Salad, Potato Salad, Coleslaw', 'value': 'salads'},
-    #         {'label': r'Hummus', 'value': 'hummus'},
-    #         {'label': r'Refrigerated Juice, Perishable Beverages', 'value': 'juice'},
-    #         {'label': r'Soy Milk', 'value': 'soy_milk'}
-    #     ],
-    #     values=[]
-    # )
+    dcc.Checklist(
+        id='dairy_eggs_subcat',
+        options=[
+            {'label': r'Fluid Dairy (Milk, Half and Half, Eggnog, etc)', 'value': 'fluid_dairy'},
+            {'label': r'Yogurt, Sour Cream, Cottage Cheese, Pasta', 'value': 'multi'},
+            {'label': r'Salad, Potato Salad, Coleslaw', 'value': 'salads'},
+            {'label': r'Hummus', 'value': 'hummus'},
+            {'label': r'Refrigerated Juice, Perishable Beverages', 'value': 'juice'},
+            {'label': r'Soy Milk', 'value': 'soy_milk'}
+        ],
+        values=[]
+    )
 ])
+
+@app.callback(Output('output-submit', 'children'),
+              [Input('button', 'n_clicks')],
+              [State('zipcode', 'value')])
+def update_output(_, input):
+    print(input)
 
 @app.callback(Output(component_id='dairy_eggs', component_property='style'),
               [Input(component_id='item', component_property='value')])
@@ -157,15 +169,15 @@ def toggle_container(toggle_value):
     else:
         return {'display': 'none'}
 
-# @app.callback(Output(component_id='dairy_eggs_subcat', component_property='style'),
-#               [Input(component_id='dairy_eggs', component_property='values')])
-# def toggle_container(checklist_values):
-#     if 'refrigerated' in checklist_values and \
-#             'damage_compromised_packaged' not in checklist_values and  \
-#             'odor_discoloration' not in checklist_values and 'mold' not in checklist_values:
-#         return {'display': 'block'}
-#     else:
-#         return {'display': 'none'}
+@app.callback(Output(component_id='dairy_eggs_subcat', component_property='style'),
+              [Input(component_id='dairy_eggs', component_property='values')])
+def toggle_container(checklist_values):
+    if 'refrigerated' in checklist_values and \
+            'damage_compromised_packaged' not in checklist_values and  \
+            'odor_discoloration' not in checklist_values and 'mold' not in checklist_values:
+        return {'display': 'block'}
+    else:
+        return {'display': 'none'}
 
 def get_lat_long():
     g = geocoder.ip('me')
